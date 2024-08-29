@@ -43,13 +43,7 @@ function addGamesToPage(games) {
     // append the game to the games-container
     gamesContainer.appendChild(gameCard)
 
-    })
-
-    
-
-
-
-        
+    })       
 
 }
 
@@ -111,10 +105,9 @@ function filterUnfundedOnly() {
 
     // use filter() to get a list of games that have not yet met their goal
     const not_fully_funded  = GAMES_JSON.filter((game)=>{
-        return game.backers < game.goal
+        return game.pledged < game.goal
     
     })
-    console.log(not_fully_funded.length)
     
     addGamesToPage(not_fully_funded)
 
@@ -131,9 +124,8 @@ function filterFundedOnly() {
 
     // use filter() to get a list of games that have met or exceeded their goal
     const fully_funded = GAMES_JSON.filter((game=>{
-        return game.backers >= game.goal
+        return game.pledged >= game.goal
     }))
-    console.log(fully_funded.length)
 
     // use the function we previously created to add unfunded games to the DOM
     addGamesToPage(fully_funded)
@@ -166,13 +158,25 @@ allBtn.addEventListener('click',showAllGames)
 const descriptionContainer = document.getElementById("description-container");
 
 // use filter or reduce to count the number of unfunded games
-
+const underfunded = GAMES_JSON.reduce((acc,game)=>{
+    return acc+1
+},0)
 
 // create a string that explains the number of unfunded games using the ternary operator
 
+const display  = `A total of $${total_raised} has been raised 
+ ${underfunded>0 ? `We still need funding for ${underfunded} games please support if you can`:
+ "Thank you for all your support in funding our games" }`
+
 
 // create a new DOM element containing the template string and append it to the description container
-
+const message = document.createElement("div")
+message.classList.add("message-to-supporters")
+        // set the inner HTML using a template literal to display some info 
+message.innerHTML= `
+<p>${display}</p>
+`
+descriptionContainer.appendChild(message)
 /************************************************************************************
  * Challenge 7: Select & display the top 2 games
  * Skills used: spread operator, destructuring, template literals, sort 
@@ -187,6 +191,30 @@ const sortedGames =  GAMES_JSON.sort( (item1, item2) => {
 
 // use destructuring and the spread operator to grab the first and second games
 
+const [first,second,...rest] = sortedGames
+console.log(first)
 // create a new element to hold the name of the top pledge game, then append it to the correct element
+const topPledgedGame = document.createElement('div')
+topPledgedGame.classList.add('top-game-card')
+topPledgedGame.innerHTML = 
+`
+        <img src="${first.img}" alt="${first.name}" />
+        <h3>${first.name}</h3>
+        <p>${first.description}</p>
+        <p>amount raised: $$ {first.pledged}</p>
+        <p> total contributors ${first.backers}
+    `
 
+firstGameContainer.appendChild(topPledgedGame)
 // do the same for the runner up item
+const secPledgedGame = document.createElement('div')
+secPledgedGame.classList.add('2nd-game-card')
+secPledgedGame.innerHTML = 
+`
+        <img src="${second.img}" alt="${second.name}" />
+        <h3>${second.name}</h3>
+        <p>${second.description}</p>
+        <p>amount raised: $ ${second.pledged}</p>
+        <p>total contributors ${second.backers}
+`
+secondGameContainer.appendChild(secPledgedGame)
